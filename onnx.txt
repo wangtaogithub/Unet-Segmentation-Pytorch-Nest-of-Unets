@@ -1,0 +1,8 @@
+torch.load
+model.to
+model.eval
+
+torch.onnx.export
+
+-m onnxsim 
+onnx2ncnn
