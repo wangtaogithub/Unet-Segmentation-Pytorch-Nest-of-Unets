@@ -1,0 +1,136 @@
+import torch
+torch_model = torch.load("save.pt") # pytorch模型加载
+batch_size = 1  #批处理大小
+input_shape = (3,244,244)   #输入数据
+
+# set the model to inference mode
+torch_model.eval()
+
+x = torch.randn(batch_size,*input_shape)		# 生成张量
+export_onnx_file = "test.onnx"					# 目的ONNX文件名
+torch.onnx.export(torch_model,
+                    x,
+                    export_onnx_file,
+                    opset_version=10,
+                    do_constant_folding=True,	# 是否执行常量折叠优化
+                    input_names=["input"],		# 输入名
+                    output_names=["output"],	# 输出名
+                    dynamic_axes={"input":{0:"batch_size"},		# 批处理变量
+                                    "output":{0:"batch_size"}})
+
+
+
+
+
+本篇幅介绍pytorch模型转ONNX模型
+一、pytorch模型保存/加载
+有两种方式可用于保存/加载pytorch模型 1）文件中保存模型结构和权重参数 2）文件只保留模型权重.
+
+1、文件中保存模型结构和权重参数
+1）pytorch模型保存
+
+import torch
+torch.save(selfmodel,"save.pt")
+1
+2
+2）pytorch模型加载
+
+import torch
+torch.load("save.pt")
+1
+2
+2、文件只保留模型权重
+1）pytorch模型保存
+
+import torch
+torch.save(selfmodel.state_dict(),"save.pt")
+1
+2
+2）pytorch模型加载
+
+selfmodel.load_state_dict(torch.load("save.pt"))
+1
+二、pytorch模型转ONNX模型
+1、文件中保存模型结构和权重参数
+import torch
+torch_model = torch.load("save.pt") # pytorch模型加载
+batch_size = 1  #批处理大小
+input_shape = (3,244,244)   #输入数据
+
+# set the model to inference mode
+torch_model.eval()
+
+x = torch.randn(batch_size,*input_shape)		# 生成张量
+export_onnx_file = "test.onnx"					# 目的ONNX文件名
+torch.onnx.export(torch_model,
+                    x,
+                    export_onnx_file,
+                    opset_version=10,
+                    do_constant_folding=True,	# 是否执行常量折叠优化
+                    input_names=["input"],		# 输入名
+                    output_names=["output"],	# 输出名
+                    dynamic_axes={"input":{0:"batch_size"},		# 批处理变量
+                                    "output":{0:"batch_size"}})
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+注：dynamic_axes字段用于批处理.若不想支持批处理或固定批处理大小,移除dynamic_axes字段即可.
+2、文件中只保留模型权重
+import torch
+torch_model = selfmodel()  					# 由研究员提供python.py文件
+batch_size = 1 								# 批处理大小
+input_shape = (3, 244, 244) 				# 输入数据
+
+# set the model to inference mode
+torch_model.eval()
+
+x = torch.randn(batch_size,*input_shape) 	# 生成张量
+export_onnx_file = "test.onnx" 				# 目的ONNX文件名
+torch.onnx.export(torch_model,
+                    x,
+                    export_onnx_file,
+                    opset_version=10,
+                    do_constant_folding=True,	# 是否执行常量折叠优化
+                    input_names=["input"],		# 输入名
+                    output_names=["output"],	# 输出名
+                    dynamic_axes={"input":{0:"batch_size"},	# 批处理变量
+                                    "output":{0:"batch_size"}})
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+链接:
+1）pytorch官方文档.
